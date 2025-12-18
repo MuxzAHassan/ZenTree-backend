@@ -1,0 +1,92 @@
+openapi: 3.0.0
+
+info:
+  title: ZenTree
+  version: "1.0.0"
+  description: Authentication API Documentation
+
+servers:
+  - url: https://zentree-backend-24l6.onrender.com/api
+    description: Production server
+  - url: http://localhost:5000/api
+    description: Local development
+
+paths:
+  /auth/signup:
+    post:
+      summary: Register a new user
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignupRequest"
+      responses:
+        "200":
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StandardResponse"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    SignupRequest:
+      type: object
+      required:
+        - firstName
+        - lastName
+        - gender
+        - dateOfBirth
+        - phone
+        - email
+        - password
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        gender:
+          type: string
+        dateOfBirth:
+          type: string
+          format: date-time
+        phone:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+
+    StandardResponse:
+      type: object
+      properties:
+        response:
+          type: object
+        message:
+          type: string
+        status:
+          type: string
+        length:
+          type: integer
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string

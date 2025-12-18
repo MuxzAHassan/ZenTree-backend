@@ -1,24 +1,25 @@
-const express = require('express'); // Import Express framework
-const cors = require('cors');  //allows frontend to acces backend
-require('dotenv').config(); // loads environment variables from a .env file into process.env
+import dotenv from "dotenv";
+dotenv.config();
 
-const app = express(); //create express app
-const PORT = process.env.PORT || 8080; // Define the port, 8080 if not set
+import pool from "./src/config/db.js";
+import app from "./src/app.js";
 
-app.use(cors()); // Enable CORS for all routes (cross-origin requests)
-app.use(express.json()); // Middleware to parse JSON request bodies
+const PORT = process.env.PORT || 5000;
+const HOST = process.env.HOST || "localhost";
+const SERVER_URL = `http://${HOST}:${PORT}`;
 
-//Import routes
-const authRoutes = require('./routes/auth');
-//use routes
-app.use('/api/auth',authRoutes);
+(async () => {
+  try {
+    const client = await pool.connect();
+    console.log("✅ PostgreSQL connected successfully");
+    client.release();
+  } catch (err) {
+    console.error("❌ PostgreSQL connection failed:", err.message);
+  }
+})();
 
-// Simple test route
-app.get('/', (req, res)=> {
-    res.json({ message: 'NakUrut backend berjaya yeyy!🙌'});
-});
-
-// Start the server
-app.listen(PORT, ()=> {
-    console.log(`Server tengah running kat http://localhost:${PORT}`);
+app.listen(PORT, () => {
+  console.log("Server is running:");
+  console.log(SERVER_URL);
+  console.log(`Swagger Docs: ${SERVER_URL}/api/docs`);
 });
