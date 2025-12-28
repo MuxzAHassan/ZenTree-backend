@@ -1,16 +1,22 @@
 import jwt, { decode } from "jsonwebtoken";
 
 export const authenticate = (req, res, next) => {
-  const authHeader = req.headeres.authorization;
-  if (!authHeader) return res.sendStatus(401);
+  const authHeader = req.headers.authorization;
+  if (!authHeader){
+    return res.status(401).json({ message: "Authorization header missing" }); //added message
+  } 
 
-  const token = authHeader.split("")[1];
+  const token = authHeader.split(" ")[1]; //added space in the split
+
+  if (!token) {
+    return res.status(401).json({ message: "Token missing" });
+  }
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;
     next();
   } catch (error) {
-    res.sendStatus(403);
+    return res.status(403).json({ message: "Invalid token" });
   }
 };

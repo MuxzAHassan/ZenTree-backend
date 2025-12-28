@@ -23,18 +23,90 @@ paths:
             schema:
               $ref: "#/components/schemas/SignupRequest"
       responses:
-        "200":
+        "201":
           description: User registered successfully
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/StandardResponse"
+        "400":
+          description: User already exists
         "500":
           description: Server error
+
+  /auth/login:
+    post:
+      summary: User login
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  example: email@email.com
+                password:
+                  type: string
+                  example: password123
+      responses:
+        "200":
+          description: Login successful
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  token:
+                    type: string
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      firstName:
+                        type: string
+                      lastName:
+                        type: string
+                      email:
+                        type: string
+        "400":
+          description: Invalid email or password
+        "500":
+          description: Internal server error
+
+  /users/profile:
+    get:
+      summary: Get authenticated user profile
+      tags: [Users]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: User profile fetched successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      email:
+                        type: string
+        "401":
+          description: Authorization header missing
+        "403":
+          description: Invalid token
 
 components:
   securitySchemes:
@@ -72,21 +144,3 @@ components:
         password:
           type: string
           format: password
-
-    StandardResponse:
-      type: object
-      properties:
-        response:
-          type: object
-        message:
-          type: string
-        status:
-          type: string
-        length:
-          type: integer
-
-    ErrorResponse:
-      type: object
-      properties:
-        message:
-          type: string
