@@ -6,10 +6,10 @@ info:
   description: Authentication API Documentation
 
 servers:
-  - url: https://zentree-backend-24l6.onrender.com/api
-    description: Production server
   - url: http://localhost:5000/api
     description: Local development
+  - url: https://zentree-backend-24l6.onrender.com/api
+    description: Production server
 
 paths:
   /auth/signup:
@@ -75,6 +75,9 @@ paths:
                         type: string
                       email:
                         type: string
+                      role:
+                        type: string
+                        enum: [user, partner]
         "400":
           description: Invalid email or password
         "500":
@@ -126,6 +129,7 @@ components:
         - phone
         - email
         - password
+        - role
       properties:
         firstName:
           type: string
@@ -144,3 +148,8 @@ components:
         password:
           type: string
           format: password
+        role:
+          type: string
+          enum: [user, partner]
+          description: User role - either 'user' or 'partner'
+          example: user

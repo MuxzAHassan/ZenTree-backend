@@ -1,0 +1,12 @@
+2. Booking Function (user) IZZAT
+2.1 - User click 'Booking'
+2.2 - User click search for available services
+2.3 - User choose and click desired shop/partner
+2.4 - User see shop/partner details
+2.5 - User click book now
+2.6 - User select date and time
+2.7 - User click 'Submit Booking'
+
+- Restructure the authentication where the registration can have two roles - user and partner
+- In the frontend, where the user will see different screen and partner will see different screen
+- Fix that it required user to logout and can't login back

@@ -4,10 +4,16 @@ import jwt from "jsonwebtoken"; //added JWT
 
 export const signup = async (req, res) => {
   try {
-    const { firstName, lastName, gender, dateOfBirth, phone, email, password } =
+    const { firstName, lastName, gender, dateOfBirth, phone, email, role = "user", password } =
       req.body;
 
-    console.log("Signup attempt for email:", email); // Debug log
+    // Validate role - ensure it's lowercase and valid
+    const normalizedRole = (role || "user").toLowerCase().trim();
+    if (!["user", "partner"].includes(normalizedRole)) {
+      return res.status(400).json({ message: "Invalid role. Must be 'user' or 'partner'" });
+    }
+
+    console.log("Signup attempt for email:", email, "with role:", normalizedRole); // Debug log
 
     const existingUser = await findUserByEmail(email);
     if (existingUser) {
@@ -28,6 +34,7 @@ export const signup = async (req, res) => {
       dateOfBirth: parsedDOB,
       phone,
       email,
+      role: normalizedRole,
       password: hashedPassword,
     });
 
@@ -60,19 +67,20 @@ export const login = async (req, res) => {
 
     //Create JWT
     const token = jwt.sign(
-      { id: user.id, email: user.email },
+      { id: user.id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
 
     //return token
-    res.status(200).json({ success: true, message: "Login successful", 
-      token, 
-      user: { 
-        id: user.id, 
-        email: user.email, 
+    res.status(200).json({ success: true, message: "Login successful",
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
         firstName: user.firstName,
-        lastName: user.lastName 
+        lastName: user.lastName,
+        role: user.role
         }
     });
   }

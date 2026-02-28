@@ -7,13 +7,14 @@ export const createUser = async ({
   dateOfBirth,
   phone,
   email,
+  role,
   password,
 }) => {
   const query = `
     INSERT INTO "User"
-    ("firstName", "lastName", gender, "dateOfBirth", phone, email, password)
-    VALUES ($1, $2, $3, $4, $5, $6, $7)
-    RETURNING id, email
+    ("firstName", "lastName", gender, "dateOfBirth", phone, email, role, password)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    RETURNING id, email, role
   `;
 
   const values = [
@@ -23,6 +24,7 @@ export const createUser = async ({
     dateOfBirth,
     phone,
     email,
+    role || 'user',
     password,
   ];
 
