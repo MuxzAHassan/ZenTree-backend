@@ -1,3 +1,17 @@
+============================================
+ZenTree / NakUrut - Development TODO
+============================================
+
+[2026-03-29] COMPLETE BOOKING FLOW - User Prompt
+-------------------------------------------------
+Requirements from user (Muaz):
+1. Search for available service by partner using geolocation, fetching the nearest partner that offers services.
+2. After finding the partner, user can book a slot by keying in date and time, sending a request to partner.
+3. Partner side will receive a notification on the phone, and a record on his booking from a user in the booking section.
+4. Partner can Accept or Reject a booking from the user, and if the Partner Accept the booking, a booking record will be created.
+
+Previous TODOs:
+-------------------------------------------------
 2. Booking Function (user) IZZAT
 2.1 - User click 'Booking'
 2.2 - User click search for available services
@@ -7,6 +21,5 @@
 2.6 - User select date and time
 2.7 - User click 'Submit Booking'
 
-- Restructure the authentication where the registration can have two roles - user and partner
-- In the frontend, where the user will see different screen and partner will see different screen
-- Fix that it required user to logout and can't login back
+- Restructure backend to create table 'auth' that have roles column to differentiate user and partner [DONE 2026-03-29]
+- Fix that it required user to logout and can't login back [DONE 2026-03-29]
