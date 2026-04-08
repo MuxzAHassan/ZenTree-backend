@@ -26,7 +26,7 @@ export const getNearbyPartners = async (req, res) => {
               COUNT(s.id) AS "serviceCount"
        FROM "User" u
        LEFT JOIN "Service" s ON s."partnerId" = u.id AND s."isActive" = true
-       WHERE u.role = 'partner' AND u.latitude IS NOT NULL AND u.longitude IS NOT NULL
+       WHERE u.role = 'partner' AND u."isActive" = true AND u.latitude IS NOT NULL AND u.longitude IS NOT NULL
        GROUP BY u.id
        ORDER BY u."firstName" ASC`
     );
@@ -123,6 +123,56 @@ export const updateLocation = async (req, res) => {
     res.status(200).json({ success: true, message: "Location updated successfully" });
   } catch (error) {
     if (process.env.NODE_ENV === "development") console.error("Update location error:", error.message);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+// Get the partner's current isActive status
+export const getActiveStatus = async (req, res) => {
+  try {
+    const partnerId = req.user.id;
+    const { rows } = await pool.query(
+      `SELECT "isActive" FROM "User" WHERE id = $1 AND role = 'partner'`,
+      [partnerId]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ success: false, message: "Partner not found" });
+    }
+
+    res.status(200).json({ success: true, isActive: rows[0].isActive });
+  } catch (error) {
+    if (process.env.NODE_ENV === "development") console.error("Get active status error:", error.message);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
+// Toggle the partner's isActive status
+export const toggleActiveStatus = async (req, res) => {
+  try {
+    const partnerId = req.user.id;
+    const { isActive } = req.body;
+
+    if (typeof isActive !== "boolean") {
+      return res.status(400).json({ success: false, message: "isActive must be a boolean" });
+    }
+
+    const { rows } = await pool.query(
+      `UPDATE "User" SET "isActive" = $1 WHERE id = $2 AND role = 'partner' RETURNING "isActive"`,
+      [isActive, partnerId]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ success: false, message: "Partner not found" });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: isActive ? "You are now Active — users can find you" : "You are now Inactive — hidden from search",
+      isActive: rows[0].isActive,
+    });
+  } catch (error) {
+    if (process.env.NODE_ENV === "development") console.error("Toggle active error:", error.message);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
