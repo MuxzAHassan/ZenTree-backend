@@ -7,22 +7,25 @@ export const signup = async (req, res) => {
     const { firstName, lastName, gender, dateOfBirth, phone, email, role = "user", password } =
       req.body;
 
-    // Validate role - ensure it's lowercase and valid
-    const normalizedRole = (role || "user").toLowerCase().trim();
-    if (!["user", "partner"].includes(normalizedRole)) {
-      return res.status(400).json({ message: "Invalid role. Must be 'user' or 'partner'" });
+    if (!firstName || !lastName || !gender || !phone || !email || !password) {
+      return res.status(400).json({ success: false, message: "All fields are required" });
     }
 
-    console.log("Signup attempt for email:", email, "with role:", normalizedRole); // Debug log
+    const normalizedRole = (role || "user").toLowerCase().trim();
+    if (!["user", "partner"].includes(normalizedRole)) {
+      return res.status(400).json({ success: false, message: "Invalid role. Must be 'user' or 'partner'" });
+    }
+
+    console.log("Signup attempt for email:", email, "with role:", normalizedRole);
 
     const existingUser = await findUserByEmail(email);
     if (existingUser) {
-      return res.status(400).json({ message: "User already exists" });
+      return res.status(400).json({ success: false, message: "User already exists" });
     }
 
     const parsedDOB = new Date(dateOfBirth);
     if (isNaN(parsedDOB)) {
-      return res.status(400).json({ message: "Invalid dateOfBirth format" });
+      return res.status(400).json({ success: false, message: "Invalid dateOfBirth format" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -39,15 +42,17 @@ export const signup = async (req, res) => {
     });
 
     res.status(201).json({
+      success: true,
       message: "User created successfully",
       user,
     });
   } catch (error) {
-    console.error("Signup error:", error); // More detailed error log
-    console.error("Error stack:", error.stack); // Stack trace
+    console.error("Signup error:", error.message);
+    console.error("Error stack:", error.stack);
     res.status(500).json({
+      success: false,
       message: "Internal server error",
-      error: process.env.NODE_ENV === "development" ? error.message : undefined, // Show error in dev
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
     });
   }
 };
@@ -56,13 +61,17 @@ export const login = async (req, res) => {
   try{
     const { email, password } = req.body;
 
+    if (!email || !password) {
+      return res.status(400).json({ success: false, message: "Email and password are required" });
+    }
+
     const user = await findUserByEmail(email);
     if (!user) {
-      return res.status(400).json({ message: "email atau password salah oi" });
+      return res.status(400).json({ success: false, message: "Invalid email or password" });
     }
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return res.status(400).json({ success: false, message: "email atau password salah oi" });
+      return res.status(400).json({ success: false, message: "Invalid email or password" });
     }
 
     //Create JWT
