@@ -11,6 +11,8 @@ import { swaggerSetup } from "./docs/swagger.js";
 
 const app = express();
 
+app.set("trust proxy", 1);
+
 // Restricted CORS
 app.use(
   cors({

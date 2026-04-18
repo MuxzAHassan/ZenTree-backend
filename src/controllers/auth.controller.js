@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { findUserByEmail, createUser } from "../models/user.model.js";
+import { findUserByEmail, findUserByEmailForLogin, createUser } from "../models/user.model.js";
 import jwt from "jsonwebtoken"; //added JWT
 
 export const signup = async (req, res) => {
@@ -73,7 +73,7 @@ export const login = async (req, res) => {
       return res.status(400).json({ success: false, message: "Email and password are required" });
     }
 
-    const user = await findUserByEmail(email);
+    const user = await findUserByEmailForLogin(email);
     if (!user) {
       return res.status(400).json({ success: false, message: "Invalid email or password" });
     }
