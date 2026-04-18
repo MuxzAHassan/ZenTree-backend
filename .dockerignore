@@ -1,0 +1,10 @@
+# Added by muaz on 2026-04-02
+# This file tells Docker what to ignore when building the backend image.
+# We ignore node_modules because we want Docker to install its own OS-specific dependencies.
+node_modules
+npm-debug.log
+.env
+.git
+.gitignore
+Dockerfile
+.dockerignore

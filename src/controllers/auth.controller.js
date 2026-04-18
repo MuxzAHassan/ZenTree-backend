@@ -4,8 +4,16 @@ import jwt from "jsonwebtoken"; //added JWT
 
 export const signup = async (req, res) => {
   try {
-    const { firstName, lastName, gender, dateOfBirth, phone, email, role = "user", password } =
-      req.body;
+    const {
+      firstName,
+      lastName,
+      gender,
+      dateOfBirth,
+      phone,
+      email,
+      role = "user",
+      password,
+    } = req.body;
 
     if (!firstName || !lastName || !gender || !phone || !email || !password) {
       return res.status(400).json({ success: false, message: "All fields are required" });
@@ -58,7 +66,7 @@ export const signup = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-  try{
+  try {
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -78,24 +86,23 @@ export const login = async (req, res) => {
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "1h" },
     );
 
-    //return token
-    res.status(200).json({ success: true, message: "Login successful",
+    res.status(200).json({
+      success: true,
+      message: "Login successful",
       token,
       user: {
         id: user.id,
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
-        role: user.role
-        }
+        role: user.role,
+      },
     });
-  }
-
-  catch(error){
-    console.error("Login error:", error); // Login detail error log
-    res.status(500).json({ message: "Internal server error" });
+  } catch (error) {
+    console.error("Login error:", error.message);
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };

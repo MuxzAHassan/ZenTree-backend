@@ -1,15 +1,17 @@
-import jwt, { decode } from "jsonwebtoken";
+// [FIX 2026-03-29] Removed unused { decode } import — only jwt.verify is needed (#14)
+import jwt from "jsonwebtoken";
 
 export const authenticate = (req, res, next) => {
   const authHeader = req.headers.authorization;
-  if (!authHeader){
-    return res.status(401).json({ message: "Authorization header missing" }); //added message
+  if (!authHeader) {
+    // [FIX 2026-03-29] Standardized response format with success: false (#10)
+    return res.status(401).json({ success: false, message: "Authorization header missing" });
   }
 
-  const token = authHeader.split(" ")[1]; //added space in the split
+  const token = authHeader.split(" ")[1];
 
   if (!token) {
-    return res.status(401).json({ message: "Token missing" });
+    return res.status(401).json({ success: false, message: "Token missing" });
   }
 
   try {
@@ -17,13 +19,13 @@ export const authenticate = (req, res, next) => {
     req.user = decoded;
     next();
   } catch (error) {
-    return res.status(403).json({ message: "Invalid token" });
+    return res.status(403).json({ success: false, message: "Invalid or expired token" });
   }
 };
 
 export const authorizeRole = (...roles) => (req, res, next) => {
   if (!roles.includes(req.user.role)) {
-    return res.status(403).json({ message: "Forbidden" });
+    return res.status(403).json({ success: false, message: "Forbidden: insufficient role" });
   }
   next();
 };
